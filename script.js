@@ -15,8 +15,7 @@ let sec=-1;
 let min=0;
 
 //for audio
-let path="./audio/a.mp3";
-let audio=new Audio(path);
+
 
 // timer function
 let handler = function() {
@@ -35,9 +34,26 @@ function generates_random_candies() {
     return candy[Math.floor(Math.random()*candy.length)];
 }
 
+
+//check for phone 
+function checkDevice() {
+    if (navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)) {
+        deviceFlag = true;
+    } else {
+        deviceFlag = false;
+    }
+}
+
+
 // initialising candies to box function
 function start_game() {
-
+    checkDevice()
     for(let r=0; r < rows; r++) {
         let row=[];
         for(let c=0; c < coloums; c++){
@@ -46,6 +62,12 @@ function start_game() {
             img.src= "./photos/" + generates_random_candies() + ".png" ;
             document.getElementById('box').append(img);
             
+            if (deviceFlag) {
+                img.addEventListener('touchstart', touchstart);
+                // img.addEventListener('touchenter', touchenter);
+                img.addEventListener("touchend", touchend);
+            }
+            else {
 
             img.addEventListener('dragstart', dragstart);
             img.addEventListener("dragenter" , dragenter);
@@ -53,6 +75,10 @@ function start_game() {
             // img.addEventListener("dragleave" , dragleave);
             img.addEventListener("drop" , dragdrop);
             img.addEventListener("dragend" , dragend);
+            
+            }
+
+            
             row.push(img);
             
         }
@@ -66,7 +92,7 @@ window.onload=function() {
   window.setInterval(function(){
         crush_candy_5();
         crush_candy_4();
-        crush_candy();
+        crush_candy_3();
         document.getElementById('score').innerHTML=score;
         candy_slider();
         candy_generator();
@@ -77,24 +103,32 @@ window.onload=function() {
 function dragstart() {
     curImg=this;
     flag=true;
+    // console.log("kutta");
     
 }
+
 
 function dragenter(e) {
     e.preventDefault();
    
 }
 
+
 function dragover(e) {
     e.preventDefault();
 
 }
 
+
 function dragdrop() {
     nextImg=this;
+    
 }
 
+
+
 function dragend() {
+
     if( curImg.src.includes("Black_colour")  ||  nextImg.src.includes("Black_colour")) {
         return;
     }
@@ -163,7 +197,7 @@ function check_move(ro,co) {
 }
 
 // crushing candy 3
-function crush_candy() {
+function crush_candy_3() {
     for(let i=0; i<rows; i++) {
         for(let j=0; j<coloums-2; j++) {
             let candy1=box[i][j];
@@ -174,6 +208,8 @@ function crush_candy() {
                 candy1.src="./photos/Black_colour.jpg";
                 candy2.src="./photos/Black_colour.jpg";
                 candy3.src="./photos/Black_colour.jpg";
+                let path="./audio/a.mp3";
+                let audio=new Audio(path);
                 audio.play();
                 audio.volume=0.8;
                 if(flag==true){
@@ -194,6 +230,8 @@ function crush_candy() {
                 candy1.src="./photos/Black_colour.jpg";
                 candy2.src="./photos/Black_colour.jpg";
                 candy3.src="./photos/Black_colour.jpg";
+                let path="./audio/a.mp3";
+                let audio=new Audio(path);
                 audio.play();
                 audio.volume=0.8;
                 if(flag==true){
@@ -219,6 +257,8 @@ function crush_candy_4() {
                 candy2.src="./photos/Black_colour.jpg";
                 candy3.src="./photos/Black_colour.jpg";
                 candy4.src="./photos/Black_colour.jpg";
+                let path="./audio/a.mp3";
+                let audio=new Audio(path);
                 audio.play();
                 audio.volume=0.8;
                 if(flag==true){
@@ -241,6 +281,8 @@ function crush_candy_4() {
                 candy2.src="./photos/Black_colour.jpg";
                 candy3.src="./photos/Black_colour.jpg";
                 candy4.src="./photos/Black_colour.jpg";
+                let path="./audio/a.mp3";
+                let audio=new Audio(path);
                 audio.play();
                 audio.volume=0.8;
                 if(flag==true){
@@ -269,6 +311,8 @@ function crush_candy_5() {
                 candy3.src="./photos/Black_colour.jpg";
                 candy4.src="./photos/Black_colour.jpg";
                 candy5.src="./photos/Black_colour.jpg";
+                let path="./audio/a.mp3";
+                let audio=new Audio(path);
                 audio.play();
                 audio.volume=0.8;
                 if(flag==true){
@@ -293,6 +337,8 @@ function crush_candy_5() {
                 candy3.src="./photos/Black_colour.jpg";
                 candy4.src="./photos/Black_colour.jpg";
                 candy5.src="./photos/Black_colour.jpg";
+                let path="./audio/a.mp3";
+                let audio=new Audio(path);
                 audio.play();
                 audio.volume=0.8;
                 if(flag==true){
@@ -329,6 +375,85 @@ function candy_generator() {
         if(box[0][i].src.includes("Black_colour")){
         box[0][i].src="./photos/" + generates_random_candies() + ".png" ;
         }
+    }
+}
+
+
+// fuction for phone 
+
+let ident;
+let currX;
+let currY;
+let Row;
+let Col;
+let nextRow;
+let nextCol;
+function touchstart(e) {
+    touch = [...e.changedTouches];
+    ident = touch[0].identifier;
+    Row = nextRow = e.target.id[0];
+    Col = nextCol = e.target.id[2];
+    currX = touch[0].pageX;
+    currY = touch[0].pageY;
+    flag = true;
+}
+
+// function touchenter(e) {
+//     e.preventDefault();
+// }
+
+function touchend(e) {
+    touch = [...e.changedTouches];
+    if (touch[0].identifier == ident) {
+        let endX = touch[0].pageX;
+        let endY = touch[0].pageY;
+        diffX = currX - endX;
+        diffY = currY - endY;
+        if (diffX == 0 || diffY == 0) {
+            // console.log("not moved");
+            return;
+        }
+        if (Math.abs(diffX) >= Math.abs(diffY)) {
+            if (diffX > 0) 
+                nextCol--;
+            else
+                nextCol++;
+        }
+        else {
+            if (diffY > 0)
+                nextRow--;
+            else 
+                nextRow++;
+        }
+
+        // console.log(nextRow,nextCol);
+        if (nextRow < 0 || nextRow >= 8 || nextCol < 0 || nextCol >= 8) {
+            // console.log("invalid move");
+            return;
+        }
+        changeImg();
+    }
+
+}
+
+
+function changeImg() {
+    let curr = box[Row][Col];
+    let next = box[nextRow][nextCol];
+    let temp = curr.src;
+    curr.src = next.src;
+    next.src = temp;
+
+     // checking valid move
+    let validMove = check_move();
+    if (validMove == false) {
+        let beep = new Audio("./audio/b.mp3");
+        beep.play();
+        setTimeout(function () {
+            let temp = curr.src;
+            curr.src = next.src;
+            next.src = temp;
+        }, 200);
     }
 }
 
